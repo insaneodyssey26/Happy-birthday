@@ -100,7 +100,7 @@ fun HappyBirthdayApp() {
 @Composable
 fun SplashScreen(navController: NavHostController) {
     LaunchedEffect(Unit) {
-        delay(2000) // Show splash for 2 seconds
+        delay(2000)
         navController.navigate("reveal") {
             popUpTo("splash") { inclusive = true }
         }
@@ -121,16 +121,15 @@ fun RevealButtonScreen(navController: NavHostController) {
 
 @Composable
 fun AnimatedConfetti(modifier: Modifier = Modifier) {
-    // Light, festive confetti colors
     val confettiCount = 40
     val confettiColors = listOf(
-        Color(0xFFFFA8B8), // pastel pink
-        Color(0xFFFFF59D), // pastel yellow
-        Color(0xFFB8FFD6), // mint
-        Color(0xFFB8A8FF), // light purple
-        Color(0xFF80DEEA), // light blue
-        Color(0xFFFFE0EC), // very light pink
-        Color(0xFFE0C3FC)  // very light purple
+        Color(0xFFFFA8B8),
+        Color(0xFFFFF59D),
+        Color(0xFFB8FFD6),
+        Color(0xFFB8A8FF),
+        Color(0xFF80DEEA),
+        Color(0xFFFFE0EC),
+        Color(0xFFE0C3FC)
     )
     val random = remember { java.util.Random() }
     val transition = rememberInfiniteTransition(label = "confetti")
@@ -203,16 +202,16 @@ fun AnimatedGradientBackground(content: @Composable () -> Unit) {
             .background(
                 Brush.linearGradient(
                     colors = listOf(
-                        Color(0xFF181C2F), // deep navy
-                        Color(0xFF232946), // dark blue
-                        Color(0xFF39375B), // indigo
-                        Color(0xFF4F2E5E), // deep purple
-                        Color(0xFF2C394B), // dark teal
-                        Color(0xFF3A506B), // blue-grey
-                        Color(0xFF5F4B8B), // purple highlight
-                        Color(0xFF00C9A7), // teal highlight
-                        Color(0xFFB983FF), // magenta highlight
-                        Color(0xFF181C2F)  // repeat for smooth loop
+                        Color(0xFF181C2F),
+                        Color(0xFF232946),
+                        Color(0xFF39375B),
+                        Color(0xFF4F2E5E),
+                        Color(0xFF2C394B),
+                        Color(0xFF3A506B),
+                        Color(0xFF5F4B8B),
+                        Color(0xFF00C9A7),
+                        Color(0xFFB983FF),
+                        Color(0xFF181C2F)
                     ),
                     start = Offset(0f, offset),
                     end = Offset(offset, 0f)
@@ -223,11 +222,9 @@ fun AnimatedGradientBackground(content: @Composable () -> Unit) {
 
 @Composable
 fun BirthdayWishScreen() {
-    // Animation state
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
-    // Glowing border animation for photo (pulse)
     val infiniteTransition = rememberInfiniteTransition(label = "glow")
     val angle by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -252,11 +249,10 @@ fun BirthdayWishScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp), // Removed vertical argument
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Top festive row
             Row(
                 modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -265,14 +261,12 @@ fun BirthdayWishScreen() {
                 Text("✨", fontSize = 36.sp)
                 Text("🎉", fontSize = 36.sp)
             }
-            // Main content
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.weight(1f)
             ) {
                 AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
                     Box(contentAlignment = Alignment.Center) {
-                        // Glowing animated border (pulse) with larger size and more glow
                         val glowColor = Color(0xFFFFF59D).copy(alpha = 0.5f)
                         Box(
                             modifier = Modifier
@@ -336,14 +330,14 @@ fun BirthdayWishScreen() {
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Cursive,
-                            fontSize = 44.sp, // Larger font for more impact
+                            fontSize = 44.sp,
                             shadow = Shadow(
                                 color = glowAnimColor,
                                 offset = Offset(0f, 0f),
                                 blurRadius = 24f
                             )
                         ),
-                        color = Color(0xFFFFF59D), // bright yellow for visibility
+                        color = Color(0xFFFFF59D),
                         modifier = Modifier
                             .scale(scale)
                             .padding(bottom = 32.dp)
@@ -365,12 +359,12 @@ fun BirthdayWishScreen() {
                         text = "Always keep bettering yourself, keep growing up... Wishing you all the best!!",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.SemiBold,
-                            fontSize = 26.sp, // Larger font for better use of space
+                            fontSize = 26.sp,
                             fontFamily = FontFamily.Serif,
                             fontStyle = FontStyle.Italic,
-                            lineHeight = 36.sp // More line height for breathing room
+                            lineHeight = 36.sp
                         ),
-                        color = Color(0xFFFFE0EC), // very light pink for high contrast
+                        color = Color(0xFFFFE0EC),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .fillMaxWidth()
@@ -381,7 +375,6 @@ fun BirthdayWishScreen() {
                     )
                 }
                 Spacer(modifier = Modifier.height(32.dp))
-                // Awesome Note Button/Tile
                 var showNote by remember { mutableStateOf(false) }
                 val animatedGradient = rememberInfiniteTransition(label = "noteBtnGradient")
                 val gradientShift by animatedGradient.animateFloat(
@@ -395,23 +388,23 @@ fun BirthdayWishScreen() {
                 AnimatedVisibility(visible = !showNote, enter = fadeIn(), exit = fadeOut()) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(0.6f) // Make button narrower
-                            .height(48.dp) // Reduce height
+                            .fillMaxWidth(0.6f)
+                            .height(48.dp)
                             .clip(CircleShape)
                             .background(
                                 Brush.linearGradient(
                                     colors = listOf(
-                                        Color(0xFFB8FFD6), // mint
-                                        Color(0xFFFFA8B8), // pastel pink
-                                        Color(0xFFFFF59D), // pastel yellow
-                                        Color(0xFFB8A8FF), // light purple
-                                        Color(0xFFB8FFD6)  // mint (repeat for loop)
+                                        Color(0xFFB8FFD6),
+                                        Color(0xFFFFA8B8),
+                                        Color(0xFFFFF59D),
+                                        Color(0xFFB8A8FF),
+                                        Color(0xFFB8FFD6)
                                     ),
                                     start = androidx.compose.ui.geometry.Offset(0f, gradientShift),
                                     end = androidx.compose.ui.geometry.Offset(gradientShift, 0f)
                                 )
                             )
-                            .shadow(12.dp, CircleShape) // Slightly less shadow for subtlety
+                            .shadow(12.dp, CircleShape)
                             .border(1.5.dp, Color.White, CircleShape)
                             .clickable { showNote = true },
                         contentAlignment = Alignment.Center
@@ -428,14 +421,13 @@ fun BirthdayWishScreen() {
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     color = Color(0xFF232946),
-                                    fontSize = 18.sp // Smaller font size
+                                    fontSize = 18.sp
                                 ),
                                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
                             )
                         }
                     }
                 }
-                // Show message when showNote is true
                 AnimatedVisibility(visible = showNote, enter = fadeIn(), exit = fadeOut()) {
                     Box(
                         modifier = Modifier
@@ -457,14 +449,13 @@ fun BirthdayWishScreen() {
                     }
                 }
                 Spacer(modifier = Modifier.height(48.dp))
-                // Bottom festive row (emojis)
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Text("💐", fontSize = 36.sp, color = Color(0xFFFFF59D)) // yellow
-                    Text("🥳", fontSize = 36.sp, color = Color(0xFFFFE0EC)) // light pink
-                    Text("🌸", fontSize = 36.sp, color = Color(0xFFB8FFD6)) // mint
+                    Text("💐", fontSize = 36.sp, color = Color(0xFFFFF59D))
+                    Text("🥳", fontSize = 36.sp, color = Color(0xFFFFE0EC))
+                    Text("🌸", fontSize = 36.sp, color = Color(0xFFB8FFD6))
                 }
             }
         }
