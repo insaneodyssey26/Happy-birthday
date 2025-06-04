@@ -64,6 +64,9 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.foundation.layout.offset
 import androidx.compose.animation.core.rememberInfiniteTransition
 import coil.compose.AsyncImage
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.text.font.FontStyle
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -214,13 +217,26 @@ fun BirthdayWishScreen() {
 
     AnimatedGradientBackground {
         AnimatedConfetti(modifier = Modifier)
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 0.dp),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Top festive row
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Text("🎈", fontSize = 36.sp)
+                Text("✨", fontSize = 36.sp)
+                Text("🎉", fontSize = 36.sp)
+            }
+            // Main content
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                modifier = Modifier.weight(1f)
             ) {
                 AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
                     Box(contentAlignment = Alignment.Center) {
@@ -252,9 +268,8 @@ fun BirthdayWishScreen() {
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
-                    // Animated Happy Birthday text
                     val scale by infiniteTransition.animateFloat(
                         initialValue = 1f,
                         targetValue = 1.15f,
@@ -268,7 +283,7 @@ fun BirthdayWishScreen() {
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Cursive,
-                            fontSize = 36.sp
+                            fontSize = 38.sp
                         ),
                         color = Color(0xFF7C3AED),
                         modifier = Modifier.scale(scale)
@@ -278,10 +293,12 @@ fun BirthdayWishScreen() {
                     Text(
                         text = "Always keep going, keep growing up... Wishing you all the best!!",
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 20.sp
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 22.sp,
+                            fontFamily = FontFamily.Serif,
+                            fontStyle = FontStyle.Italic
                         ),
-                        color = Color(0xFF6D28D9),
+                        color = Color(0xFFB80060),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .fillMaxWidth(),
@@ -290,12 +307,11 @@ fun BirthdayWishScreen() {
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                Spacer(modifier = Modifier.height(32.dp)) // Increased space between text and emojis
+                Spacer(modifier = Modifier.height(32.dp))
                 AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
                     BouncingEmojis("🎂💝🎈")
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-                // Cute GIF (user should add a gif named 'cute_birthday.gif' in drawable)
                 AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
                     AsyncImage(
                         model = "android.resource://com.masum.happybirthday/drawable/cute_birthday",
@@ -304,6 +320,15 @@ fun BirthdayWishScreen() {
                         contentScale = ContentScale.Crop
                     )
                 }
+            }
+            // Bottom festive row
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Text("💐", fontSize = 32.sp)
+                Text("🥳", fontSize = 32.sp)
+                Text("🌸", fontSize = 32.sp)
             }
         }
     }
