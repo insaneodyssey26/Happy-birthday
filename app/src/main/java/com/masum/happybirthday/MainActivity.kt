@@ -290,7 +290,7 @@ fun BirthdayWishScreen() {
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(32.dp)) // Increased space between text and emojis
                 AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
                     BouncingEmojis("🎂💝🎈")
                 }
