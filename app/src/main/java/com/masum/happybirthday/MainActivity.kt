@@ -5,13 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,30 +41,49 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.masum.happybirthday.ui.theme.HappyBirthdayTheme
+import kotlinx.coroutines.delay
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.masum.happybirthday.ui.theme.HappyBirthdayTheme
-import kotlinx.coroutines.delay
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.draw.scale
+import androidx.compose.foundation.layout.offset
+import androidx.compose.animation.core.rememberInfiniteTransition
+import coil.compose.AsyncImage
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            HappyBirthdayTheme {
-                val navController = rememberNavController()
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    NavHost(navController = navController, startDestination = "splash") {
-                        composable("splash") { SplashScreen(navController) }
-                        composable("reveal") { RevealButtonScreen(navController) }
-                        composable("wish") { BirthdayWishScreen() }
-                    }
-                }
+            HappyBirthdayApp()
+        }
+    }
+}
+
+@Composable
+fun HappyBirthdayApp() {
+    HappyBirthdayTheme {
+        val navController = rememberNavController()
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+            NavHost(navController = navController, startDestination = "splash") {
+                composable("splash") { SplashScreen(navController) }
+                composable("reveal") { RevealButtonScreen(navController) }
+                composable("wish") { BirthdayWishScreen() }
             }
         }
     }
@@ -91,12 +112,87 @@ fun RevealButtonScreen(navController: NavHostController) {
 }
 
 @Composable
+fun AnimatedConfetti(modifier: Modifier = Modifier) {
+    // Simple confetti animation using Canvas and random positions/colors
+    val confettiCount = 40
+    val confettiColors = listOf(
+        Color(0xFFFFA8B8), Color(0xFFB8A8FF), Color(0xFFB8FFD6), Color(0xFFFFF59D), Color(0xFF80DEEA)
+    )
+    val random = remember { java.util.Random() }
+    val transition = rememberInfiniteTransition(label = "confetti")
+    val yOffsets = List(confettiCount) {
+        transition.animateFloat(
+            initialValue = -random.nextInt(200).toFloat(),
+            targetValue = 1200f + random.nextInt(200),
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 3500 + random.nextInt(1000), easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Restart
+            ), label = "y$it"
+        )
+    }
+    Canvas(modifier = modifier.fillMaxSize()) {
+        for (i in 0 until confettiCount) {
+            drawCircle(
+                color = confettiColors[i % confettiColors.size],
+                radius = 8f + random.nextInt(8),
+                center = Offset(
+                    x = (size.width / confettiCount) * i + random.nextInt(30),
+                    y = yOffsets[i].value
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun BouncingEmojis(emojis: String) {
+    val infiniteTransition = rememberInfiniteTransition(label = "bounce")
+    val offsetY by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = -30f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(700, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = "bounceY"
+    )
+    Text(
+        emojis,
+        style = MaterialTheme.typography.headlineMedium,
+        modifier = Modifier.offset(y = offsetY.dp)
+    )
+}
+
+@Composable
+fun AnimatedGradientBackground(content: @Composable () -> Unit) {
+    val infiniteTransition = rememberInfiniteTransition(label = "bg")
+    val offset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(8000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Restart
+        ), label = "bgOffset"
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(Color(0xFFFFE0EC), Color(0xFFE0C3FC), Color(0xFFB8FFD6)),
+                    start = Offset(0f, offset),
+                    end = Offset(offset, 0f)
+                )
+            )
+    ) { content() }
+}
+
+@Composable
 fun BirthdayWishScreen() {
     // Animation state
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
-    // Glowing border animation for photo
+    // Glowing border animation for photo (pulse)
     val infiniteTransition = rememberInfiniteTransition(label = "glow")
     val angle by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -106,76 +202,108 @@ fun BirthdayWishScreen() {
             repeatMode = RepeatMode.Restart
         ), label = "angle"
     )
+    val borderWidthPx by infiniteTransition.animateFloat(
+        initialValue = 8f,
+        targetValue = 16f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1200, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = "borderWidth"
+    )
+    val borderWidth = borderWidthPx.dp
 
-    // Gradient background
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFFFFE0EC), Color(0xFFE0C3FC))
-                )
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+    AnimatedGradientBackground {
+        AnimatedConfetti(modifier = Modifier)
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
-            AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
-                Box(contentAlignment = Alignment.Center) {
-                    // Glowing animated border
-                    Box(
-                        modifier = Modifier
-                            .size(200.dp)
-                            .rotate(angle)
-                            .border(
-                                width = 8.dp,
-                                brush = Brush.sweepGradient(
-                                    listOf(
-                                        Color(0xFFFFA8B8),
-                                        Color(0xFFB8A8FF),
-                                        Color(0xFFB8FFD6),
-                                        Color(0xFFFFA8B8)
-                                    )
-                                ),
-                                shape = CircleShape
-                            )
-                    ) {}
-                    Image(
-                        painter = painterResource(id = R.drawable.her_photo),
-                        contentDescription = "Her Photo",
-                        modifier = Modifier
-                            .size(180.dp)
-                            .clip(CircleShape)
-                            .shadow(16.dp, CircleShape)
-                    )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
+                    Box(contentAlignment = Alignment.Center) {
+                        // Glowing animated border (pulse)
+                        Box(
+                            modifier = Modifier
+                                .size(200.dp)
+                                .rotate(angle)
+                                .border(
+                                    width = borderWidth,
+                                    brush = Brush.sweepGradient(
+                                        listOf(
+                                            Color(0xFFFFA8B8),
+                                            Color(0xFFB8A8FF),
+                                            Color(0xFFB8FFD6),
+                                            Color(0xFFFFA8B8)
+                                        )
+                                    ),
+                                    shape = CircleShape
+                                )
+                        ) {}
+                        Image(
+                            painter = painterResource(id = R.drawable.her_photo),
+                            contentDescription = "Her Photo",
+                            modifier = Modifier
+                                .size(180.dp)
+                                .clip(CircleShape)
+                                .shadow(16.dp, CircleShape)
+                        )
+                    }
                 }
-            }
-            AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
+                    // Animated Happy Birthday text
+                    val scale by infiniteTransition.animateFloat(
+                        initialValue = 1f,
+                        targetValue = 1.15f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(900, easing = FastOutSlowInEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ), label = "textScale"
+                    )
                     Text(
                         text = "Happy Birthday! 🎂",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = Color(0xFF7C3AED)
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Cursive,
+                            fontSize = 36.sp
+                        ),
+                        color = Color(0xFF7C3AED),
+                        modifier = Modifier.scale(scale)
                     )
+                }
+                AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
                     Text(
                         text = "Always keep going, keep growing up... Wishing you all the best!!",
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 20.sp
+                        ),
                         color = Color(0xFF6D28D9),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
-            }
-            // Simple confetti effect (emoji)
-            AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
-                Text("🎂💝🎈", style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.height(12.dp))
+                AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
+                    BouncingEmojis("🎂💝🎈")
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                // Cute GIF (user should add a gif named 'cute_birthday.gif' in drawable)
+                AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
+                    AsyncImage(
+                        model = "android.resource://com.masum.happybirthday/drawable/cute_birthday",
+                        contentDescription = "Cute Birthday GIF",
+                        modifier = Modifier.size(120.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
     }
