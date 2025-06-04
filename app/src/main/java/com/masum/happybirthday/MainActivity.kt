@@ -98,7 +98,7 @@ fun SplashScreen(navController: NavHostController) {
         }
     }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "�� Welcome! 🎈", style = MaterialTheme.typography.headlineMedium)
+        Text(text = "🎈 Welcome! 🎈", style = MaterialTheme.typography.headlineMedium)
     }
 }
 
