@@ -59,7 +59,7 @@ fun SplashScreen(navController: NavHostController) {
 fun RevealButtonScreen(navController: NavHostController) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Button(onClick = { navController.navigate("wish") }) {
-            Text(text = "Tap to reveal your birthday wish!")
+            Text(text = "Tap to reveal the surprise!")
         }
     }
 }
