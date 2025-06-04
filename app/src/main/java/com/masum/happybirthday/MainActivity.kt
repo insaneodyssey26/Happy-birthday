@@ -220,7 +220,7 @@ fun BirthdayWishScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 0.dp),
+                .padding(horizontal = 16.dp), // Removed vertical argument
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -283,27 +283,31 @@ fun BirthdayWishScreen() {
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Cursive,
-                            fontSize = 38.sp
+                            fontSize = 44.sp // Larger font for more impact
                         ),
                         color = Color(0xFF7C3AED),
-                        modifier = Modifier.scale(scale)
+                        modifier = Modifier
+                            .scale(scale)
+                            .padding(bottom = 32.dp) // Add more space below
                     )
                 }
                 AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
                     Text(
-                        text = "Always keep going, keep growing up... Wishing you all the best!!",
+                        text = "Always keep bettering yourself, keep growing up... Wishing you all the best!!",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.SemiBold,
-                            fontSize = 22.sp,
+                            fontSize = 26.sp, // Larger font for better use of space
                             fontFamily = FontFamily.Serif,
-                            fontStyle = FontStyle.Italic
+                            fontStyle = FontStyle.Italic,
+                            lineHeight = 36.sp // More line height for breathing room
                         ),
                         color = Color(0xFFB80060),
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .padding(start = 8.dp, end = 8.dp, bottom = 32.dp), // Use supported named arguments
                         textAlign = TextAlign.Center,
-                        maxLines = 2,
+                        maxLines = 3,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -333,3 +337,5 @@ fun BirthdayWishScreen() {
         }
     }
 }
+
+
