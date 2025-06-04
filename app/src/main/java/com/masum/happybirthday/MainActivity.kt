@@ -5,10 +5,16 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -70,7 +77,7 @@ fun SplashScreen(navController: NavHostController) {
         }
     }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = "🎈 Welcome! 🎈", style = MaterialTheme.typography.headlineMedium)
+        Text(text = "�� Welcome! 🎈", style = MaterialTheme.typography.headlineMedium)
     }
 }
 
@@ -89,6 +96,17 @@ fun BirthdayWishScreen() {
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
+    // Glowing border animation for photo
+    val infiniteTransition = rememberInfiniteTransition(label = "glow")
+    val angle by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(4000),
+            repeatMode = RepeatMode.Restart
+        ), label = "angle"
+    )
+
     // Gradient background
     Box(
         modifier = Modifier
@@ -105,14 +123,34 @@ fun BirthdayWishScreen() {
             verticalArrangement = Arrangement.Center
         ) {
             AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
-                Image(
-                    painter = painterResource(id = R.drawable.her_photo),
-                    contentDescription = "Her Photo",
-                    modifier = Modifier
-                        .size(180.dp)
-                        .clip(CircleShape)
-                        .shadow(16.dp, CircleShape)
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    // Glowing animated border
+                    Box(
+                        modifier = Modifier
+                            .size(200.dp)
+                            .rotate(angle)
+                            .border(
+                                width = 8.dp,
+                                brush = Brush.sweepGradient(
+                                    listOf(
+                                        Color(0xFFFFA8B8),
+                                        Color(0xFFB8A8FF),
+                                        Color(0xFFB8FFD6),
+                                        Color(0xFFFFA8B8)
+                                    )
+                                ),
+                                shape = CircleShape
+                            )
+                    ) {}
+                    Image(
+                        painter = painterResource(id = R.drawable.her_photo),
+                        contentDescription = "Her Photo",
+                        modifier = Modifier
+                            .size(180.dp)
+                            .clip(CircleShape)
+                            .shadow(16.dp, CircleShape)
+                    )
+                }
             }
             AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
                 Column(
@@ -137,7 +175,7 @@ fun BirthdayWishScreen() {
             }
             // Simple confetti effect (emoji)
             AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
-                Text("🎉🎊✨🥳", style = MaterialTheme.typography.headlineMedium)
+                Text("🎂💝🎈", style = MaterialTheme.typography.headlineMedium)
             }
         }
     }
