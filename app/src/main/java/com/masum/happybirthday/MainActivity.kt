@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import com.masum.happybirthday.ui.theme.HappyBirthdayTheme
 import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +73,10 @@ fun BirthdayWishScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.her_photo),
+            contentDescription = "Her Photo"
+        )
         Text(text = "Happy Birthday! 🎂", style = MaterialTheme.typography.headlineLarge)
         Text(text = "Wishing you a day filled with love and joy!", style = MaterialTheme.typography.bodyLarge)
     }
