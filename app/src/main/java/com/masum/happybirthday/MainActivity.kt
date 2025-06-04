@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -41,11 +42,14 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.sp
 import com.masum.happybirthday.ui.theme.HappyBirthdayTheme
 import kotlinx.coroutines.delay
@@ -116,10 +120,16 @@ fun RevealButtonScreen(navController: NavHostController) {
 
 @Composable
 fun AnimatedConfetti(modifier: Modifier = Modifier) {
-    // Simple confetti animation using Canvas and random positions/colors
+    // Light, festive confetti colors
     val confettiCount = 40
     val confettiColors = listOf(
-        Color(0xFFFFA8B8), Color(0xFFB8A8FF), Color(0xFFB8FFD6), Color(0xFFFFF59D), Color(0xFF80DEEA)
+        Color(0xFFFFA8B8), // pastel pink
+        Color(0xFFFFF59D), // pastel yellow
+        Color(0xFFB8FFD6), // mint
+        Color(0xFFB8A8FF), // light purple
+        Color(0xFF80DEEA), // light blue
+        Color(0xFFFFE0EC), // very light pink
+        Color(0xFFE0C3FC)  // very light purple
     )
     val random = remember { java.util.Random() }
     val transition = rememberInfiniteTransition(label = "confetti")
@@ -128,9 +138,19 @@ fun AnimatedConfetti(modifier: Modifier = Modifier) {
             initialValue = -random.nextInt(200).toFloat(),
             targetValue = 1200f + random.nextInt(200),
             animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 3500 + random.nextInt(1000), easing = FastOutSlowInEasing),
+                animation = tween(durationMillis = 6000 + random.nextInt(2000), easing = FastOutSlowInEasing),
                 repeatMode = RepeatMode.Restart
             ), label = "y$it"
+        )
+    }
+    val xDrifts = List(confettiCount) {
+        transition.animateFloat(
+            initialValue = 0f,
+            targetValue = (-30..30).random().toFloat(),
+            animationSpec = infiniteRepeatable(
+                animation = tween(durationMillis = 6000 + random.nextInt(2000), easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse
+            ), label = "x$it"
         )
     }
     Canvas(modifier = modifier.fillMaxSize()) {
@@ -139,7 +159,7 @@ fun AnimatedConfetti(modifier: Modifier = Modifier) {
                 color = confettiColors[i % confettiColors.size],
                 radius = 8f + random.nextInt(8),
                 center = Offset(
-                    x = (size.width / confettiCount) * i + random.nextInt(30),
+                    x = (size.width / confettiCount) * i + xDrifts[i].value,
                     y = yOffsets[i].value
                 )
             )
@@ -181,7 +201,18 @@ fun AnimatedGradientBackground(content: @Composable () -> Unit) {
             .fillMaxSize()
             .background(
                 Brush.linearGradient(
-                    colors = listOf(Color(0xFFFFE0EC), Color(0xFFE0C3FC), Color(0xFFB8FFD6)),
+                    colors = listOf(
+                        Color(0xFF181C2F), // deep navy
+                        Color(0xFF232946), // dark blue
+                        Color(0xFF39375B), // indigo
+                        Color(0xFF4F2E5E), // deep purple
+                        Color(0xFF2C394B), // dark teal
+                        Color(0xFF3A506B), // blue-grey
+                        Color(0xFF5F4B8B), // purple highlight
+                        Color(0xFF00C9A7), // teal highlight
+                        Color(0xFFB983FF), // magenta highlight
+                        Color(0xFF181C2F)  // repeat for smooth loop
+                    ),
                     start = Offset(0f, offset),
                     end = Offset(offset, 0f)
                 )
@@ -240,10 +271,18 @@ fun BirthdayWishScreen() {
             ) {
                 AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
                     Box(contentAlignment = Alignment.Center) {
-                        // Glowing animated border (pulse)
+                        // Glowing animated border (pulse) with larger size and more glow
+                        val glowColor = Color(0xFFFFF59D).copy(alpha = 0.5f)
                         Box(
                             modifier = Modifier
-                                .size(200.dp)
+                                .size(260.dp)
+                                .shadow(60.dp, CircleShape, ambientColor = glowColor, spotColor = glowColor)
+                                .background(glowColor, CircleShape)
+                                .align(Alignment.Center)
+                        ) {}
+                        Box(
+                            modifier = Modifier
+                                .size(220.dp)
                                 .rotate(angle)
                                 .border(
                                     width = borderWidth,
@@ -257,14 +296,16 @@ fun BirthdayWishScreen() {
                                     ),
                                     shape = CircleShape
                                 )
+                                .align(Alignment.Center)
                         ) {}
                         Image(
                             painter = painterResource(id = R.drawable.her_photo),
                             contentDescription = "Her Photo",
                             modifier = Modifier
-                                .size(180.dp)
+                                .size(200.dp)
                                 .clip(CircleShape)
-                                .shadow(16.dp, CircleShape)
+                                .shadow(24.dp, CircleShape)
+                                .align(Alignment.Center)
                         )
                     }
                 }
@@ -278,20 +319,47 @@ fun BirthdayWishScreen() {
                             repeatMode = RepeatMode.Reverse
                         ), label = "textScale"
                     )
+                    val glowState = remember { mutableStateOf(true) }
+                    val glowAnimColor by animateColorAsState(
+                        targetValue = if (glowState.value) Color(0xFFFFF59D) else Color(0xFFFFE0EC),
+                        animationSpec = tween(durationMillis = 1200, easing = FastOutSlowInEasing)
+                    )
+                    LaunchedEffect(Unit) {
+                        while (true) {
+                            glowState.value = !glowState.value
+                            delay(1200)
+                        }
+                    }
                     Text(
                         text = "Happy Birthday! 🎂",
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Bold,
                             fontFamily = FontFamily.Cursive,
-                            fontSize = 44.sp // Larger font for more impact
+                            fontSize = 44.sp, // Larger font for more impact
+                            shadow = Shadow(
+                                color = glowAnimColor,
+                                offset = Offset(0f, 0f),
+                                blurRadius = 24f
+                            )
                         ),
-                        color = Color(0xFF7C3AED),
+                        color = Color(0xFFFFF59D), // bright yellow for visibility
                         modifier = Modifier
                             .scale(scale)
-                            .padding(bottom = 32.dp) // Add more space below
+                            .padding(bottom = 32.dp)
                     )
                 }
                 AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
+                    val glowState2 = remember { mutableStateOf(true) }
+                    val glowAnimColor2 by animateColorAsState(
+                        targetValue = if (glowState2.value) Color(0xFFFFE0EC) else Color(0xFFB8FFD6),
+                        animationSpec = tween(durationMillis = 1200, easing = FastOutSlowInEasing)
+                    )
+                    LaunchedEffect(Unit) {
+                        while (true) {
+                            glowState2.value = !glowState2.value
+                            delay(1200)
+                        }
+                    }
                     Text(
                         text = "Always keep bettering yourself, keep growing up... Wishing you all the best!!",
                         style = MaterialTheme.typography.bodyLarge.copy(
@@ -301,19 +369,19 @@ fun BirthdayWishScreen() {
                             fontStyle = FontStyle.Italic,
                             lineHeight = 36.sp // More line height for breathing room
                         ),
-                        color = Color(0xFFB80060),
+                        color = Color(0xFFFFE0EC), // very light pink for high contrast
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .fillMaxWidth()
-                            .padding(start = 8.dp, end = 8.dp, bottom = 32.dp), // Use supported named arguments
+                            .padding(start = 8.dp, end = 8.dp, bottom = 32.dp),
                         textAlign = TextAlign.Center,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis
+                        maxLines = Int.MAX_VALUE,
+                        overflow = TextOverflow.Clip
                     )
                 }
                 Spacer(modifier = Modifier.height(32.dp))
                 AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
-                    BouncingEmojis("🎂💝🎈")
+                    BouncingEmojis("🎂💝🎉🎈")
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
@@ -330,12 +398,10 @@ fun BirthdayWishScreen() {
                 modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text("💐", fontSize = 32.sp)
-                Text("🥳", fontSize = 32.sp)
-                Text("🌸", fontSize = 32.sp)
+                Text("💐", fontSize = 32.sp, color = Color(0xFFFFF59D)) // yellow
+                Text("🥳", fontSize = 32.sp, color = Color(0xFFFFE0EC)) // light pink
+                Text("🌸", fontSize = 32.sp, color = Color(0xFFB8FFD6)) // mint
             }
         }
     }
 }
-
-
