@@ -435,6 +435,27 @@ fun BirthdayWishScreen() {
                         }
                     }
                 }
+                // Show message when showNote is true
+                AnimatedVisibility(visible = showNote, enter = fadeIn(), exit = fadeOut()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(60.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFFFE0EC)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Akhono implement kora hoini :(",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF232946),
+                                fontSize = 18.sp
+                            ),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(48.dp))
                 // Bottom festive row (emojis)
                 Row(
