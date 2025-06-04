@@ -67,6 +67,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.draw.scale
 import androidx.compose.foundation.layout.offset
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.foundation.clickable
 import coil.compose.AsyncImage
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -380,27 +381,70 @@ fun BirthdayWishScreen() {
                     )
                 }
                 Spacer(modifier = Modifier.height(32.dp))
-                AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
-                    BouncingEmojis("🎂💝🎉🎈")
+                // Awesome Note Button/Tile
+                var showNote by remember { mutableStateOf(false) }
+                val animatedGradient = rememberInfiniteTransition(label = "noteBtnGradient")
+                val gradientShift by animatedGradient.animateFloat(
+                    initialValue = 0f,
+                    targetValue = 1000f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(4000, easing = FastOutSlowInEasing),
+                        repeatMode = RepeatMode.Restart
+                    ), label = "gradientShift"
+                )
+                AnimatedVisibility(visible = !showNote, enter = fadeIn(), exit = fadeOut()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f) // Make button narrower
+                            .height(48.dp) // Reduce height
+                            .clip(CircleShape)
+                            .background(
+                                Brush.linearGradient(
+                                    colors = listOf(
+                                        Color(0xFFB8FFD6), // mint
+                                        Color(0xFFFFA8B8), // pastel pink
+                                        Color(0xFFFFF59D), // pastel yellow
+                                        Color(0xFFB8A8FF), // light purple
+                                        Color(0xFFB8FFD6)  // mint (repeat for loop)
+                                    ),
+                                    start = androidx.compose.ui.geometry.Offset(0f, gradientShift),
+                                    end = androidx.compose.ui.geometry.Offset(gradientShift, 0f)
+                                )
+                            )
+                            .shadow(12.dp, CircleShape) // Slightly less shadow for subtlety
+                            .border(1.5.dp, Color.White, CircleShape)
+                            .clickable { showNote = true },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            androidx.compose.material3.Icon(
+                                painter = painterResource(id = R.drawable.ic_sticky_note),
+                                contentDescription = "Note Icon",
+                                tint = Color(0xFF232946),
+                                modifier = Modifier.size(20.dp).padding(end = 6.dp)
+                            )
+                            Text(
+                                text = "Show Note",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF232946),
+                                    fontSize = 18.sp // Smaller font size
+                                ),
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
                 }
-                Spacer(modifier = Modifier.height(24.dp))
-                AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
-                    AsyncImage(
-                        model = "android.resource://com.masum.happybirthday/drawable/cute_birthday",
-                        contentDescription = "Cute Birthday GIF",
-                        modifier = Modifier.size(120.dp),
-                        contentScale = ContentScale.Crop
-                    )
+                Spacer(modifier = Modifier.height(48.dp))
+                // Bottom festive row (emojis)
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text("💐", fontSize = 36.sp, color = Color(0xFFFFF59D)) // yellow
+                    Text("🥳", fontSize = 36.sp, color = Color(0xFFFFE0EC)) // light pink
+                    Text("🌸", fontSize = 36.sp, color = Color(0xFFB8FFD6)) // mint
                 }
-            }
-            // Bottom festive row
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Text("💐", fontSize = 32.sp, color = Color(0xFFFFF59D)) // yellow
-                Text("🥳", fontSize = 32.sp, color = Color(0xFFFFE0EC)) // light pink
-                Text("🌸", fontSize = 32.sp, color = Color(0xFFB8FFD6)) // mint
             }
         }
     }
